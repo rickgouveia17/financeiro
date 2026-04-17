@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sistema Farol</title>
+  <link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+
+  <aside class="sidebar">
+    <div class="sidebar-logo">🚦 <span>Sistema Farol</span></div>
+
+    <div class="sidebar-section">PRINCIPAL</div>
+    <a href="#" class="nav-item active" onclick="return showPage('dashboard',this)">
+      <span class="dot" style="background:#3b82f6"></span> Dashboard
+    </a>
+    <a href="#" class="nav-item" onclick="return showPage('varal',this)">
+      <span class="dot" style="background:#f39c12"></span> Notas Penduradas
+      <em class="badge-count" id="badge-pendencia" style="display:none">0</em>
+    </a>
+    <a href="#" class="nav-item" onclick="return showPage('relatorios',this)">
+      <span class="dot" style="background:#8b5cf6"></span> Relatórios
+    </a>
+
+    <div class="sidebar-section">AÇÕES</div>
+    <a href="#" class="nav-item" onclick="abrirModal(); return false;">
+      <span class="dot" style="background:#27ae60"></span> Nova NF
+    </a>
+
+    <div class="sidebar-footer">
+      <button class="btn-excel" onclick="exportarExcel()">⬇ Exportar Excel</button>
+      <button class="btn-upload" onclick="document.getElementById('input-upload').click()">⬆ Importar Planilha</button>
+      <input type="file" id="input-upload" accept=".xlsx,.xls" style="display:none" onchange="uploadPlanilha(this)"/>
+    </div>
+  </aside>
+
+  <div class="main">
+
+    <div class="topbar">
+      <h2 id="page-title">Dashboard</h2>
+      <button class="btn-primary" onclick="abrirModal()">+ Nova NF</button>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="summary-grid">
+        <div class="summary-card blue">
+          <div class="s-icon">📄</div>
+          <div class="s-info">
+            <div class="s-label">Total no Varal</div>
+            <div class="s-value" id="d-total">0</div>
+          </div>
+        </div>
+        <div class="summary-card orange">
+          <div class="s-icon">⏱</div>
+          <div class="s-info">
+            <div class="s-label">Aguardando Medição</div>
+            <div class="s-value" id="d-medicao">0</div>
+          </div>
+        </div>
+        <div class="summary-card red">
+          <div class="s-icon">⚠️</div>
+          <div class="s-info">
+            <div class="s-label">Com Pendência</div>
+            <div class="s-value" id="d-pendencia">0</div>
+          </div>
+        </div>
+        <div class="summary-card green">
+          <div class="s-icon">✅</div>
+          <div class="s-info">
+            <div class="s-label">Concluídas</div>
+            <div class="s-value" id="d-concluida">0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row-2col">
+        <div class="table-box">
+          <div class="table-title">⚠️ Pendências e Alertas</div>
+          <table>
+            <thead><tr><th>NF</th><th>Fornecedor</th><th>Valor</th><th>Status</th><th>Dias</th></tr></thead>
+            <tbody id="tabela-alertas"></tbody>
+          </table>
+        </div>
+        <div class="table-box">
+          <div class="table-title">✅ Últimas Concluídas</div>
+          <table>
+            <thead><tr><th>NF</th><th>Fornecedor</th><th>Valor</th><th>Obs</th></tr></thead>
+            <tbody id="tabela-concluidas"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTAS PENDURADAS -->
+    <div id="page-varal" class="page">
+      <div class="board">
+        <div class="col" data-status="processando">
+          <div class="col-header orange-bg">⏱ EM PROCESSAMENTO</div>
+          <div class="cards" id="cards-processando"></div>
+        </div>
+        <div class="col" data-status="medicao">
+          <div class="col-header yellow-bg">📋 EM MEDIÇÃO</div>
+          <div class="cards" id="cards-medicao"></div>
+        </div>
+        <div class="col" data-status="pendencia">
+          <div class="col-header red-bg">⚠ COM PENDÊNCIA</div>
+          <div class="cards" id="cards-pendencia"></div>
+        </div>
+        <div class="col" data-status="concluida">
+          <div class="col-header green-bg">✅ CONCLUÍDAS</div>
+          <div class="cards" id="cards-concluida"></div>
+        </div>
+      </div>
+      <div class="drop-zones">
+        <div class="drop-zone ok" data-target="concluida">
+          <span>📁</span><strong>ARRASTAR PARA OK</strong><small>Aprovar para Lançamento</small>
+        </div>
+        <div class="drop-zone erro" data-target="pendencia">
+          <span>📁</span><strong>ARRASTAR COM ERRO</strong><small>Devedor/Ajustar</small>
+        </div>
+      </div>
+    </div>
+
+    <!-- RELATÓRIOS -->
+    <div id="page-relatorios" class="page">
+      <div class="table-box">
+        <div class="table-title">📁 Todas as Notas Fiscais</div>
+        <table>
+          <thead>
+            <tr><th>NF</th><th>Fornecedor</th><th>Valor</th><th>Status</th><th>Observação</th><th>Dias</th><th>Ação</th></tr>
+          </thead>
+          <tbody id="tabela-relatorio"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-box">
+      <h2>Nova Nota Fiscal</h2>
+      <input id="m-numero"     placeholder="Número NF"/>
+      <input id="m-fornecedor" placeholder="Fornecedor"/>
+      <input id="m-valor"      placeholder="Valor (ex: 15500)" type="number"/>
+      <input id="m-obs"        placeholder="Observação"/>
+      <select id="m-status">
+        <option value="processando">Em Processamento</option>
+        <option value="medicao">Em Medição</option>
+        <option value="pendencia">Com Pendência</option>
+        <option value="concluida">Concluída</option>
+      </select>
+      <div class="modal-actions">
+        <button onclick="salvarNota()">Salvar</button>
+        <button onclick="fecharModal()" class="cancel">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
