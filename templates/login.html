@@ -20,300 +20,342 @@
       display: flex;
       background: #fff;
       border-radius: 18px;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.13);
       overflow: hidden;
-      width: 820px;
-      min-height: 480px;
+      width: 840px;
+      min-height: 500px;
     }
 
-    /* ── LADO ESQUERDO — ANIMAÇÃO ── */
+    /* ── LADO ESQUERDO ── */
     .login-art {
       flex: 1;
-      background: linear-gradient(135deg, #1b2232 0%, #2a3a5c 100%);
+      background: linear-gradient(160deg, #1b2232 0%, #2e4070 100%);
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      padding: 40px 30px;
+      justify-content: flex-end;
+      padding-bottom: 36px;
       position: relative;
       overflow: hidden;
     }
 
-    .login-art h2 {
-      color: #f0a500;
-      font-size: 1.3rem;
-      margin-bottom: 6px;
-      z-index: 2;
-    }
-
-    .login-art p {
-      color: #9aa5bf;
-      font-size: 0.82rem;
-      text-align: center;
-      z-index: 2;
-    }
-
-    /* Desk scene */
-    .scene {
-      width: 260px;
-      height: 220px;
-      position: relative;
-      margin-bottom: 24px;
-    }
-
-    /* Mesa */
-    .desk {
+    /* fundo decorativo */
+    .login-art::before {
+      content: '';
       position: absolute;
-      bottom: 0;
+      top: -60px; right: -60px;
+      width: 220px; height: 220px;
+      background: rgba(240,165,0,0.07);
+      border-radius: 50%;
+    }
+    .login-art::after {
+      content: '';
+      position: absolute;
+      bottom: 80px; left: -40px;
+      width: 140px; height: 140px;
+      background: rgba(79,142,247,0.08);
+      border-radius: 50%;
+    }
+
+    .art-title {
+      position: absolute;
+      top: 36px;
+      text-align: center;
+      z-index: 3;
+    }
+    .art-title h2 { color: #f0a500; font-size: 1.25rem; margin-bottom: 4px; }
+    .art-title p  { color: #7a8aaa; font-size: 0.78rem; }
+
+    /* ── CENA ── */
+    .scene {
+      position: relative;
+      width: 300px;
+      height: 280px;
+      z-index: 2;
+    }
+
+    /* MESA */
+    .desk-top {
+      position: absolute;
+      bottom: 60px;
       left: 10px;
       right: 10px;
-      height: 14px;
+      height: 18px;
       background: #c8a96e;
+      border-radius: 6px 6px 2px 2px;
+      box-shadow: 0 4px 0 #a07840;
+      z-index: 4;
+    }
+    .desk-leg { position: absolute; bottom: 0; width: 14px; background: #a07840; border-radius: 0 0 3px 3px; z-index: 3; }
+    .desk-leg.l { left: 30px;  height: 60px; }
+    .desk-leg.r { right: 30px; height: 60px; }
+
+    /* CADEIRA */
+    .chair-back {
+      position: absolute;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 54px; height: 60px;
+      background: #2a3a5c;
+      border-radius: 6px 6px 0 0;
+      z-index: 1;
+    }
+    .chair-seat {
+      position: absolute;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 70px; height: 12px;
+      background: #2a3a5c;
       border-radius: 4px;
+      z-index: 2;
     }
-    .desk-leg {
-      position: absolute;
-      bottom: -30px;
-      width: 10px;
-      height: 30px;
-      background: #a07840;
-      border-radius: 2px;
-    }
-    .desk-leg.left  { left: 30px; }
-    .desk-leg.right { right: 30px; }
 
-    /* Pilha de papéis */
-    .papers {
+    /* PAPÉIS NA MESA */
+    .desk-papers {
       position: absolute;
-      bottom: 14px;
-      left: 30px;
-      width: 70px;
+      bottom: 78px;
+      left: 18px;
+      z-index: 5;
     }
-    .paper {
-      width: 70px;
-      height: 90px;
+    .dp {
+      position: absolute;
+      width: 52px; height: 66px;
       background: #fff;
-      border: 1px solid #ddd;
+      border: 1px solid #dde3f0;
       border-radius: 3px;
+      box-shadow: 1px 1px 4px rgba(0,0,0,0.08);
+    }
+    .dp:nth-child(1) { transform: rotate(-5deg); left: 0;   top: 0; }
+    .dp:nth-child(2) { transform: rotate(3deg);  left: 6px; top: 2px; }
+    .dp:nth-child(3) { transform: rotate(0deg);  left: 3px; top: 4px; background: #f0f4ff; }
+    .dp-line { width: 36px; height: 3px; background: #dde3f0; border-radius: 2px; margin: 8px auto 3px; }
+    .dp-line.s { width: 24px; }
+    .dp-line.o { background: #f0a500; opacity: 0.5; }
+
+    /* MONITOR */
+    .monitor {
       position: absolute;
-      bottom: 0;
-      box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
+      bottom: 78px;
+      right: 22px;
+      z-index: 5;
     }
-    .paper:nth-child(1) { transform: rotate(-4deg); left: 0; }
-    .paper:nth-child(2) { transform: rotate(2deg);  left: 4px; bottom: 2px; }
-    .paper:nth-child(3) { transform: rotate(0deg);  left: 2px; bottom: 4px; background: #f0f4ff; }
-
-    .paper-line {
-      width: 50px; height: 4px;
-      background: #dde3f0;
+    .monitor-screen {
+      width: 64px; height: 46px;
+      background: #1b2232;
+      border-radius: 5px;
+      border: 3px solid #3a4a6a;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column;
+      gap: 4px;
+      padding: 6px;
+    }
+    .monitor-line { width: 100%; height: 3px; background: #4f8ef7; border-radius: 2px; opacity: 0.7; }
+    .monitor-line.g { background: #27ae60; }
+    .monitor-line.r { background: #e74c3c; width: 60%; }
+    .monitor-stand {
+      width: 8px; height: 8px;
+      background: #3a4a6a;
+      margin: 0 auto;
+    }
+    .monitor-base {
+      width: 28px; height: 4px;
+      background: #3a4a6a;
       border-radius: 2px;
-      margin: 10px auto 4px;
+      margin: 0 auto;
     }
-    .paper-line.short { width: 35px; }
-    .paper-line.orange { background: #f0a500; opacity: 0.5; }
 
-    /* Personagem */
+    /* PERSONAGEM SENTADA */
     .person {
       position: absolute;
-      bottom: 14px;
-      right: 20px;
-      width: 80px;
-      animation: sway 3s ease-in-out infinite;
+      bottom: 60px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 6;
+      animation: breathe 3s ease-in-out infinite;
       transform-origin: bottom center;
     }
-
-    @keyframes sway {
-      0%,100% { transform: rotate(0deg); }
-      30%      { transform: rotate(-2deg); }
-      70%      { transform: rotate(1.5deg); }
-    }
-
-    /* Corpo */
-    .body-torso {
-      width: 36px; height: 50px;
-      background: #4f8ef7;
-      border-radius: 8px 8px 4px 4px;
-      margin: 0 auto;
-      position: relative;
+    @keyframes breathe {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      50%      { transform: translateX(-50%) translateY(-2px); }
     }
 
     /* Cabeça */
-    .head {
-      width: 30px; height: 30px;
+    .p-head {
+      width: 34px; height: 34px;
       background: #f5c5a3;
       border-radius: 50%;
-      margin: 0 auto 2px;
+      margin: 0 auto 0;
       position: relative;
     }
-    .hair {
+    .p-hair {
       position: absolute;
-      top: -4px; left: 2px;
-      width: 26px; height: 14px;
+      top: -5px; left: 1px;
+      width: 32px; height: 18px;
       background: #3d2b1f;
       border-radius: 50% 50% 0 0;
     }
-    .hair-side {
+    .p-hair-side {
       position: absolute;
-      top: 4px; right: -4px;
-      width: 8px; height: 16px;
+      top: 6px; right: -5px;
+      width: 9px; height: 20px;
       background: #3d2b1f;
-      border-radius: 0 4px 8px 0;
+      border-radius: 0 6px 10px 0;
+    }
+    .p-hair-side2 {
+      position: absolute;
+      top: 6px; left: -5px;
+      width: 9px; height: 20px;
+      background: #3d2b1f;
+      border-radius: 6px 0 0 10px;
+    }
+    .p-face-detail {
+      position: absolute;
+      bottom: 8px; left: 50%;
+      transform: translateX(-50%);
+      width: 14px; height: 4px;
+      border-bottom: 2px solid #e8a882;
+      border-radius: 0 0 6px 6px;
     }
 
-    /* Braços animados */
-    .arm {
-      position: absolute;
-      width: 10px; height: 36px;
+    /* Torso */
+    .p-torso {
+      width: 40px; height: 38px;
       background: #4f8ef7;
-      border-radius: 5px;
-      top: 6px;
+      border-radius: 6px 6px 2px 2px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* Braços — animados organizando papéis */
+    .p-arm {
+      position: absolute;
+      width: 11px; height: 32px;
+      background: #4f8ef7;
+      border-radius: 6px;
+      top: 4px;
       transform-origin: top center;
     }
-    .arm.left  {
-      left: -10px;
-      animation: armLeft 1.4s ease-in-out infinite;
+    .p-arm.l {
+      left: -9px;
+      animation: armOrganizeL 1.6s ease-in-out infinite;
     }
-    .arm.right {
-      right: -10px;
-      animation: armRight 1.4s ease-in-out infinite;
+    .p-arm.r {
+      right: -9px;
+      animation: armOrganizeR 1.6s ease-in-out infinite;
+    }
+    @keyframes armOrganizeL {
+      0%,100% { transform: rotate(-30deg); }
+      40%      { transform: rotate(10deg); }
+      70%      { transform: rotate(-15deg); }
+    }
+    @keyframes armOrganizeR {
+      0%,100% { transform: rotate(30deg); }
+      40%      { transform: rotate(-10deg); }
+      70%      { transform: rotate(20deg); }
     }
 
-    @keyframes armLeft {
-      0%,100% { transform: rotate(-20deg); }
-      50%      { transform: rotate(20deg); }
-    }
-    @keyframes armRight {
-      0%,100% { transform: rotate(20deg); }
-      50%      { transform: rotate(-20deg); }
-    }
-
-    /* Papel na mão */
-    .hand-paper {
+    /* Mãozinha com papel */
+    .p-hand {
       position: absolute;
-      bottom: -14px; left: -4px;
-      width: 18px; height: 22px;
+      bottom: -8px; left: -2px;
+      width: 14px; height: 18px;
       background: #fff;
       border: 1px solid #ccc;
       border-radius: 2px;
-      animation: paperMove 1.4s ease-in-out infinite;
-    }
-    @keyframes paperMove {
-      0%,100% { opacity: 1; }
-      50%      { opacity: 0.6; }
     }
 
-    /* Saia */
-    .skirt {
-      width: 44px; height: 24px;
+    /* Parte de baixo (sentada) */
+    .p-lap {
+      width: 48px; height: 20px;
       background: #2a3a5c;
-      border-radius: 0 0 20px 20px;
+      border-radius: 4px;
       margin: 0 auto;
     }
-
-    /* Pernas */
-    .legs {
+    .p-legs {
       display: flex;
       justify-content: center;
-      gap: 6px;
+      gap: 8px;
       margin-top: 2px;
     }
-    .leg {
-      width: 10px; height: 22px;
-      background: #f5c5a3;
+    .p-leg {
+      width: 12px; height: 18px;
+      background: #2a3a5c;
       border-radius: 0 0 4px 4px;
     }
+    .p-shoe {
+      width: 16px; height: 7px;
+      background: #1b2232;
+      border-radius: 0 4px 4px 0;
+      margin-top: 1px;
+      margin-left: -2px;
+    }
 
-    /* Papéis voando */
-    .fly-paper {
+    /* Papel voando ocasionalmente */
+    .fly {
       position: absolute;
-      width: 22px; height: 28px;
+      width: 18px; height: 22px;
       background: #fff;
-      border: 1px solid #ddd;
+      border: 1px solid #dde3f0;
       border-radius: 2px;
       opacity: 0;
-      animation: flyUp 2.8s ease-in-out infinite;
+      z-index: 7;
     }
-    .fly-paper:nth-child(1) { left: 80px; bottom: 80px; animation-delay: 0s; }
-    .fly-paper:nth-child(2) { left: 110px; bottom: 60px; animation-delay: 0.9s; transform: rotate(15deg); }
-    .fly-paper:nth-child(3) { left: 60px; bottom: 70px; animation-delay: 1.8s; transform: rotate(-10deg); }
-
-    @keyframes flyUp {
+    .fly:nth-child(1) { left: 100px; bottom: 120px; animation: flyPaper 3s 0s infinite; }
+    .fly:nth-child(2) { left: 140px; bottom: 100px; animation: flyPaper 3s 1.2s infinite; transform: rotate(12deg); }
+    @keyframes flyPaper {
       0%   { opacity: 0; transform: translateY(0) rotate(0deg); }
-      20%  { opacity: 0.8; }
-      100% { opacity: 0; transform: translateY(-60px) rotate(20deg); }
+      15%  { opacity: 0.9; }
+      100% { opacity: 0; transform: translateY(-55px) rotate(25deg); }
     }
 
-    /* ── LADO DIREITO — FORM ── */
+    .art-label {
+      color: #7a8aaa;
+      font-size: 0.75rem;
+      margin-top: 14px;
+      text-align: center;
+      z-index: 3;
+    }
+
+    /* ── FORMULÁRIO ── */
     .login-form {
       width: 340px;
-      padding: 50px 40px;
+      padding: 52px 42px;
       display: flex;
       flex-direction: column;
       justify-content: center;
     }
 
-    .login-form .logo {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: #1b2232;
-      margin-bottom: 6px;
-    }
-    .login-form .logo span { color: #f0a500; }
+    .logo { font-size: 1.6rem; font-weight: 800; color: #1b2232; margin-bottom: 4px; }
+    .logo span { color: #f0a500; }
+    .sub { font-size: 0.8rem; color: #999; margin-bottom: 34px; }
 
-    .login-form .sub {
-      font-size: 0.8rem;
-      color: #888;
-      margin-bottom: 32px;
-    }
-
-    .form-group {
-      margin-bottom: 16px;
-    }
-    .form-group label {
-      display: block;
-      font-size: 0.78rem;
-      color: #555;
-      font-weight: 600;
-      margin-bottom: 5px;
-    }
+    .form-group { margin-bottom: 18px; }
+    .form-group label { display: block; font-size: 0.78rem; color: #555; font-weight: 600; margin-bottom: 5px; }
     .form-group input {
-      width: 100%;
-      padding: 10px 14px;
-      border: 1px solid #dde1ea;
-      border-radius: 8px;
-      font-size: 0.9rem;
-      background: #f7f8fa;
-      color: #333;
-      transition: border 0.2s;
+      width: 100%; padding: 11px 14px;
+      border: 1px solid #dde1ea; border-radius: 8px;
+      font-size: 0.9rem; background: #f7f8fa; color: #333;
+      transition: border 0.2s, box-shadow 0.2s;
     }
     .form-group input:focus {
-      outline: none;
-      border-color: #4f8ef7;
-      background: #fff;
+      outline: none; border-color: #4f8ef7;
+      background: #fff; box-shadow: 0 0 0 3px rgba(79,142,247,0.1);
     }
 
     .btn-login {
-      width: 100%;
-      padding: 12px;
-      background: #f0a500;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      margin-top: 8px;
-      transition: background 0.2s;
+      width: 100%; padding: 13px;
+      background: #f0a500; color: #fff;
+      border: none; border-radius: 8px;
+      font-size: 0.95rem; font-weight: 700;
+      cursor: pointer; margin-top: 6px;
+      transition: background 0.2s, transform 0.1s;
     }
-    .btn-login:hover { background: #d4920a; }
+    .btn-login:hover  { background: #d4920a; }
+    .btn-login:active { transform: scale(0.98); }
 
-    .erro-msg {
-      color: #e74c3c;
-      font-size: 0.8rem;
-      margin-top: 10px;
-      text-align: center;
-      min-height: 18px;
-    }
+    .erro-msg { color: #e74c3c; font-size: 0.8rem; margin-top: 12px; text-align: center; min-height: 18px; }
 
     @media (max-width: 700px) {
       .login-art { display: none; }
@@ -328,49 +370,70 @@
 
   <!-- ANIMAÇÃO -->
   <div class="login-art">
+    <div class="art-title">
+      <h2>🚦 Sistema Farol</h2>
+      <p>Controle de Notas Fiscais</p>
+    </div>
+
     <div class="scene">
-      <!-- Papéis voando -->
-      <div class="fly-paper"></div>
-      <div class="fly-paper"></div>
-      <div class="fly-paper"></div>
+      <!-- papéis voando -->
+      <div class="fly"></div>
+      <div class="fly"></div>
 
-      <!-- Personagem -->
+      <!-- personagem sentada -->
       <div class="person">
-        <div class="head">
-          <div class="hair"></div>
-          <div class="hair-side"></div>
+        <div class="p-head">
+          <div class="p-hair"></div>
+          <div class="p-hair-side"></div>
+          <div class="p-hair-side2"></div>
+          <div class="p-face-detail"></div>
         </div>
-        <div class="body-torso">
-          <div class="arm left"><div class="hand-paper"></div></div>
-          <div class="arm right"></div>
+        <div class="p-torso">
+          <div class="p-arm l"><div class="p-hand"></div></div>
+          <div class="p-arm r"><div class="p-hand"></div></div>
         </div>
-        <div class="skirt"></div>
-        <div class="legs">
-          <div class="leg"></div>
-          <div class="leg"></div>
+        <div class="p-lap"></div>
+        <div class="p-legs">
+          <div class="p-leg"><div class="p-shoe"></div></div>
+          <div class="p-leg"><div class="p-shoe"></div></div>
         </div>
       </div>
 
-      <!-- Mesa -->
-      <div class="papers">
-        <div class="paper">
-          <div class="paper-line"></div>
-          <div class="paper-line short"></div>
-          <div class="paper-line orange"></div>
-          <div class="paper-line short"></div>
+      <!-- mesa -->
+      <div class="desk-top"></div>
+      <div class="desk-leg l"></div>
+      <div class="desk-leg r"></div>
+
+      <!-- cadeira -->
+      <div class="chair-back"></div>
+      <div class="chair-seat"></div>
+
+      <!-- papéis na mesa -->
+      <div class="desk-papers">
+        <div class="dp">
+          <div class="dp-line"></div>
+          <div class="dp-line s"></div>
+          <div class="dp-line o"></div>
+          <div class="dp-line s"></div>
         </div>
-        <div class="paper"></div>
-        <div class="paper"></div>
+        <div class="dp"></div>
+        <div class="dp"></div>
       </div>
 
-      <div class="desk">
-        <div class="desk-leg left"></div>
-        <div class="desk-leg right"></div>
+      <!-- monitor -->
+      <div class="monitor">
+        <div class="monitor-screen">
+          <div class="monitor-line"></div>
+          <div class="monitor-line g"></div>
+          <div class="monitor-line r"></div>
+          <div class="monitor-line"></div>
+        </div>
+        <div class="monitor-stand"></div>
+        <div class="monitor-base"></div>
       </div>
     </div>
 
-    <h2>🚦 Sistema Farol</h2>
-    <p>Controle de Notas Fiscais<br/>Organizado e seguro</p>
+    <div class="art-label">Organizando as notas do dia...</div>
   </div>
 
   <!-- FORMULÁRIO -->
@@ -400,15 +463,12 @@ async function entrar() {
   const senha   = document.getElementById('senha').value.trim();
   const erro    = document.getElementById('erro');
   erro.textContent = '';
-
   if (!usuario || !senha) { erro.textContent = 'Preencha usuário e senha.'; return; }
-
   const res = await fetch('/login', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ usuario, senha })
   });
-
   if (res.ok) {
     window.location.href = '/';
   } else {
@@ -417,6 +477,5 @@ async function entrar() {
   }
 }
 </script>
-
 </body>
 </html>
