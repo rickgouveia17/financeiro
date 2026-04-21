@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, jsonify, send_file
 import json
 import os
 import io
-from openpyxl import Workbook
+from openpyxl import Workbook, load_workbook
 from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
 
 app = Flask(__name__)
@@ -153,6 +153,97 @@ def exportar_excel():
         as_attachment=True,
         download_name='notas_fiscais.xlsx'
     )
+
+
+@app.route('/api/importar', methods=['POST'])
+def importar_excel():
+    if 'arquivo' not in request.files:
+        return jsonify({"erro": "Nenhum arquivo enviado"}), 400
+
+    arquivo = request.files['arquivo']
+    if not arquivo.filename.endswith(('.xlsx', '.xls')):
+        return jsonify({"erro": "Formato inválido. Use .xlsx ou .xls"}), 400
+
+    try:
+        wb = load_workbook(io.BytesIO(arquivo.read()), data_only=True)
+        ws = wb.active
+
+        notas_existentes = load_data()
+        ids_existentes = {n['numero']: n for n in notas_existentes}
+
+        status_map = {
+            'em processamento': 'processando',
+            'processando': 'processando',
+            'em medição': 'medicao',
+            'medição': 'medicao',
+            'medicao': 'medicao',
+            'com pendência': 'pendencia',
+            'pendência': 'pendencia',
+            'pendencia': 'pendencia',
+            'concluída': 'concluida',
+            'concluida': 'concluida',
+            'lançado': 'concluida',
+        }
+
+        importadas = 0
+        atualizadas = 0
+
+        for row in ws.iter_rows(min_row=2, values_only=True):
+            # Ignora linhas vazias
+            if not any(row):
+                continue
+
+            # Tenta extrair campos pela posição das colunas da planilha enviada
+            # Colunas: NF, Fornecedor, Valor, Status, Observação, Dias
+            try:
+                numero     = str(row[0]).strip().replace('#', '') if row[0] else None
+                fornecedor = str(row[1]).strip() if row[1] else ''
+                valor      = float(str(row[2]).replace('R$','').replace('.','').replace(',','.').strip()) if row[2] else 0
+                status_raw = str(row[3]).strip().lower() if row[3] else 'processando'
+                observacao = str(row[4]).strip() if row[4] else ''
+                dias       = int(row[5]) if row[5] else 0
+            except Exception:
+                continue
+
+            if not numero or numero == 'None':
+                continue
+
+            status = status_map.get(status_raw, 'processando')
+
+            if numero in ids_existentes:
+                # Atualiza nota existente
+                n = ids_existentes[numero]
+                n['fornecedor'] = fornecedor
+                n['valor']      = valor
+                n['status']     = status
+                n['observacao'] = observacao
+                n['dias']       = dias
+                atualizadas += 1
+            else:
+                # Cria nova nota
+                nova = {
+                    "id": next_id(notas_existentes),
+                    "numero": numero,
+                    "fornecedor": fornecedor,
+                    "valor": valor,
+                    "status": status,
+                    "observacao": observacao,
+                    "dias": dias,
+                }
+                notas_existentes.append(nova)
+                ids_existentes[numero] = nova
+                importadas += 1
+
+        save_data(notas_existentes)
+        return jsonify({
+            "ok": True,
+            "importadas": importadas,
+            "atualizadas": atualizadas,
+            "total": len(notas_existentes)
+        })
+
+    except Exception as e:
+        return jsonify({"erro": str(e)}), 500
 
 
 if __name__ == '__main__':

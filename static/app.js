@@ -171,8 +171,22 @@ function exportarExcel() {
 function uploadPlanilha(input) {
   const file = input.files[0];
   if (!file) return;
-  // por enquanto só avisa — integração real quando você trouxer o PDF
-  alert(`Planilha "${file.name}" selecionada.\nA integração será configurada em breve.`);
+
+  const formData = new FormData();
+  formData.append('arquivo', file);
+
+  fetch('/api/importar', { method: 'POST', body: formData })
+    .then(r => r.json())
+    .then(data => {
+      if (data.erro) {
+        alert('Erro ao importar: ' + data.erro);
+      } else {
+        alert(`✅ Planilha importada!\n• ${data.importadas} nota(s) nova(s)\n• ${data.atualizadas} atualizada(s)\n• Total: ${data.total}`);
+        carregarNotas();
+      }
+    })
+    .catch(() => alert('Erro ao enviar o arquivo.'));
+
   input.value = '';
 }
 
