@@ -9,7 +9,7 @@ function showPage(name, el) {
   if (el) el.classList.add('active');
   const titles = { dashboard: 'Dashboard', varal: 'Notas Penduradas', relatorios: 'Relatórios' };
   document.getElementById('page-title').textContent = titles[name] || '';
-  if (name === 'relatorios') renderTabela();
+  if (name === 'relatorios') renderTabela(document.getElementById('busca-relatorio')?.value || '');
   return false;
 }
 
@@ -91,10 +91,15 @@ function atualizarDashboard(notas) {
       </tr>`).join('');
 }
 
-function renderTabela() {
-  document.getElementById('tabela-relatorio').innerHTML = todasNotas.length === 0
-    ? '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:16px">Nenhuma nota</td></tr>'
-    : todasNotas.map(n => `<tr>
+function renderTabela(filtro = '') {
+  const termo = filtro.toLowerCase();
+  const lista = termo
+    ? todasNotas.filter(n => n.fornecedor.toLowerCase().includes(termo))
+    : todasNotas;
+
+  document.getElementById('tabela-relatorio').innerHTML = lista.length === 0
+    ? '<tr><td colspan="7" style="text-align:center;color:#aaa;padding:16px">Nenhuma nota encontrada</td></tr>'
+    : lista.map(n => `<tr>
         <td>#${n.numero}</td>
         <td>${n.fornecedor}</td>
         <td>R$ ${fmt(n.valor)}</td>
@@ -103,6 +108,18 @@ function renderTabela() {
         <td class="${n.dias > 2 ? 'dias-alerta' : ''}">${n.dias < 1 ? '<1' : n.dias}d</td>
         <td><button class="btn-del" onclick="deletarNota(${n.id})">Excluir</button></td>
       </tr>`).join('');
+}
+
+function filtrarRelatorio(val) {
+  renderTabela(val);
+}
+
+function filtrarVaral(val) {
+  const termo = val.toLowerCase();
+  document.querySelectorAll('.card').forEach(card => {
+    const titulo = card.querySelector('.card-title').textContent.toLowerCase();
+    card.style.display = (!termo || titulo.includes(termo)) ? '' : 'none';
+  });
 }
 
 // Drag & drop

@@ -214,6 +214,28 @@ tr:last-child td { border-bottom: none; }
 }
 .btn-del:hover { background: #fdecea; }
 
+/* ── SEARCH ── */
+.search-bar {
+  margin-bottom: 16px;
+}
+.search-bar input {
+  width: 100%;
+  max-width: 360px;
+  padding: 10px 16px;
+  border: 1px solid #dde1ea;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  background: #fff;
+  color: #333;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.search-bar input:focus {
+  outline: none;
+  border-color: #4f8ef7;
+  box-shadow: 0 0 0 3px rgba(79,142,247,0.1);
+}
+
 /* ── BOARD ── */
 .board {
   display: grid;

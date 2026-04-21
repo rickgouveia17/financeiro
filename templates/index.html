@@ -99,6 +99,9 @@
 
     <!-- NOTAS PENDURADAS -->
     <div id="page-varal" class="page">
+      <div class="search-bar">
+        <input type="text" id="busca-varal" placeholder="🔍 Buscar por fornecedor..." oninput="filtrarVaral(this.value)"/>
+      </div>
       <div class="board">
         <div class="col" data-status="processando">
           <div class="col-header orange-bg">⏱ EM PROCESSAMENTO</div>
@@ -130,7 +133,11 @@
     <!-- RELATÓRIOS -->
     <div id="page-relatorios" class="page">
       <div class="table-box">
-        <div class="table-title">📁 Todas as Notas Fiscais</div>
+        <div class="table-title" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>📁 Todas as Notas Fiscais</span>
+          <input type="text" id="busca-relatorio" placeholder="🔍 Buscar fornecedor..." oninput="filtrarRelatorio(this.value)"
+            style="padding:7px 12px;border:1px solid #dde1ea;border-radius:7px;font-size:0.83rem;background:#f7f8fa;width:240px;"/>
+        </div>
         <table>
           <thead>
             <tr><th>NF</th><th>Fornecedor</th><th>Valor</th><th>Status</th><th>Observação</th><th>Dias</th><th>Ação</th></tr>
