@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_file
+from flask import Flask, render_template, request, jsonify, send_file, session, redirect
 import json
 import os
 import io
@@ -6,45 +6,79 @@ from openpyxl import Workbook, load_workbook
 from openpyxl.styles import PatternFill, Font, Alignment, Border, Side
 
 app = Flask(__name__)
+app.secret_key = 'farol-secret-2026'
 
-DATA_FILE = 'data.json'
+# ── Usuários ───────────────────────────────────────
+USERS = {
+    "financeiro1": {"senha": "fin1@2026", "nome": "Financeiro 1"},
+    "financeiro2": {"senha": "fin2@2026", "nome": "Financeiro 2"},
+}
 
-def load_data():
-    if not os.path.exists(DATA_FILE):
-        notas = [
-            {"id": 1, "numero": "1045", "fornecedor": "Construtora ABC", "valor": 15500, "status": "processando", "observacao": "Status", "dias": 2},
-            {"id": 2, "numero": "1049", "fornecedor": "Ang. Obras",       "valor": 19500, "status": "processando", "observacao": "Conferindo", "dias": 1},
-            {"id": 3, "numero": "1048", "fornecedor": "Material Forte",   "valor": 8900,  "status": "medicao",     "observacao": "Conferindo", "dias": 1},
-            {"id": 4, "numero": "1042", "fornecedor": "Logística Sol",    "valor": 22150, "status": "pendencia",   "observacao": "Divergência Valor", "dias": 5},
-            {"id": 5, "numero": "1051", "fornecedor": "Eng. Tech",        "valor": 11200, "status": "pendencia",   "observacao": "Falta Medição", "dias": 3},
-            {"id": 6, "numero": "1039", "fornecedor": "Tech Obras",       "valor": 29800, "status": "concluida",   "observacao": "Conferido", "dias": 0},
-            {"id": 7, "numero": "1055", "fornecedor": "Elétrica J.J.",    "valor": 7600,  "status": "concluida",   "observacao": "Lançado", "dias": 0},
-        ]
-        save_data(notas)
+def data_file(user):
+    return f'data_{user}.json'
+
+def load_data(user):
+    f = data_file(user)
+    if not os.path.exists(f):
+        notas = []
+        save_data(user, notas)
         return notas
-    with open(DATA_FILE, 'r', encoding='utf-8') as f:
-        return json.load(f)
+    with open(f, 'r', encoding='utf-8') as fp:
+        return json.load(fp)
 
-def save_data(notas):
-    with open(DATA_FILE, 'w', encoding='utf-8') as f:
-        json.dump(notas, f, ensure_ascii=False, indent=2)
+def save_data(user, notas):
+    with open(data_file(user), 'w', encoding='utf-8') as fp:
+        json.dump(notas, fp, ensure_ascii=False, indent=2)
 
 def next_id(notas):
     return max((n['id'] for n in notas), default=0) + 1
 
-# ── Rotas ──────────────────────────────────────────
+def login_required(f):
+    from functools import wraps
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if 'user' not in session:
+            return redirect('/login')
+        return f(*args, **kwargs)
+    return decorated
 
+# ── Auth ───────────────────────────────────────────
+@app.route('/login', methods=['GET'])
+def login_page():
+    return render_template('login.html')
+
+@app.route('/login', methods=['POST'])
+def login_post():
+    body = request.get_json()
+    user = body.get('usuario', '').strip()
+    senha = body.get('senha', '').strip()
+    if user in USERS and USERS[user]['senha'] == senha:
+        session['user'] = user
+        session['nome'] = USERS[user]['nome']
+        return jsonify({"ok": True, "nome": USERS[user]['nome']})
+    return jsonify({"erro": "Usuário ou senha incorretos"}), 401
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect('/login')
+
+# ── App ────────────────────────────────────────────
 @app.route('/')
+@login_required
 def index():
-    return render_template('index.html')
+    return render_template('index.html', nome=session.get('nome'))
 
+# ── API ────────────────────────────────────────────
 @app.route('/api/notas', methods=['GET'])
+@login_required
 def get_notas():
-    return jsonify(load_data())
+    return jsonify(load_data(session['user']))
 
 @app.route('/api/notas', methods=['POST'])
+@login_required
 def create_nota():
-    notas = load_data()
+    notas = load_data(session['user'])
     body = request.get_json()
     nova = {
         "id": next_id(notas),
@@ -56,43 +90,43 @@ def create_nota():
         "dias": int(body.get('dias', 0)),
     }
     notas.append(nova)
-    save_data(notas)
+    save_data(session['user'], notas)
     return jsonify(nova), 201
 
 @app.route('/api/notas/<int:nid>/status', methods=['PATCH'])
+@login_required
 def update_status(nid):
-    notas = load_data()
+    notas = load_data(session['user'])
     body = request.get_json()
     for n in notas:
         if n['id'] == nid:
             n['status'] = body.get('status', n['status'])
-            save_data(notas)
+            save_data(session['user'], notas)
             return jsonify(n)
     return jsonify({"erro": "não encontrado"}), 404
 
 @app.route('/api/notas/<int:nid>', methods=['DELETE'])
+@login_required
 def delete_nota(nid):
-    notas = load_data()
+    notas = load_data(session['user'])
     notas = [n for n in notas if n['id'] != nid]
-    save_data(notas)
+    save_data(session['user'], notas)
     return jsonify({"ok": True})
 
 @app.route('/api/exportar', methods=['GET'])
+@login_required
 def exportar_excel():
-    notas = load_data()
-
+    notas = load_data(session['user'])
     wb = Workbook()
     ws = wb.active
     ws.title = "Notas Fiscais"
 
-    # Cores
-    fill_verde   = PatternFill("solid", fgColor="C6EFCE")  # concluida
-    fill_laranja = PatternFill("solid", fgColor="FFEB9C")  # processando / medicao
-    fill_vermelho = PatternFill("solid", fgColor="FFC7CE") # pendencia
-    fill_header  = PatternFill("solid", fgColor="1B2232")
-
-    font_header = Font(bold=True, color="FFFFFF", size=11)
-    font_normal = Font(size=10)
+    fill_verde    = PatternFill("solid", fgColor="C6EFCE")
+    fill_laranja  = PatternFill("solid", fgColor="FFEB9C")
+    fill_vermelho = PatternFill("solid", fgColor="FFC7CE")
+    fill_header   = PatternFill("solid", fgColor="1B2232")
+    font_header   = Font(bold=True, color="FFFFFF", size=11)
+    font_normal   = Font(size=10)
     border = Border(
         left=Side(style='thin', color='CCCCCC'),
         right=Side(style='thin', color='CCCCCC'),
@@ -100,7 +134,7 @@ def exportar_excel():
         bottom=Side(style='thin', color='CCCCCC')
     )
 
-    headers = ["NF", "Fornecedor", "Valor (R$)", "Status", "Observação", "Dias"]
+    headers    = ["NF", "Fornecedor", "Valor (R$)", "Status", "Observação", "Dias"]
     col_widths = [10, 28, 16, 16, 28, 8]
 
     for i, (h, w) in enumerate(zip(headers, col_widths), 1):
@@ -110,7 +144,6 @@ def exportar_excel():
         cell.alignment = Alignment(horizontal='center', vertical='center')
         cell.border = border
         ws.column_dimensions[cell.column_letter].width = w
-
     ws.row_dimensions[1].height = 22
 
     status_label = {
@@ -121,21 +154,11 @@ def exportar_excel():
     }
 
     for row_idx, n in enumerate(notas, 2):
-        valores = [
-            f"#{n['numero']}",
-            n['fornecedor'],
-            n['valor'],
-            status_label.get(n['status'], n['status']),
-            n.get('observacao', ''),
-            n.get('dias', 0)
-        ]
-        if n['status'] == 'concluida':
-            fill = fill_verde
-        elif n['status'] == 'pendencia':
-            fill = fill_vermelho
-        else:
-            fill = fill_laranja
-
+        valores = [f"#{n['numero']}", n['fornecedor'], n['valor'],
+                   status_label.get(n['status'], n['status']),
+                   n.get('observacao', ''), n.get('dias', 0)]
+        fill = fill_verde if n['status'] == 'concluida' else \
+               fill_vermelho if n['status'] == 'pendencia' else fill_laranja
         for col_idx, val in enumerate(valores, 1):
             cell = ws.cell(row=row_idx, column=col_idx, value=val)
             cell.fill = fill
@@ -146,105 +169,57 @@ def exportar_excel():
     output = io.BytesIO()
     wb.save(output)
     output.seek(0)
-
-    return send_file(
-        output,
+    return send_file(output,
         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         as_attachment=True,
-        download_name='notas_fiscais.xlsx'
-    )
-
+        download_name=f'notas_{session["user"]}.xlsx')
 
 @app.route('/api/importar', methods=['POST'])
+@login_required
 def importar_excel():
     if 'arquivo' not in request.files:
         return jsonify({"erro": "Nenhum arquivo enviado"}), 400
-
     arquivo = request.files['arquivo']
     if not arquivo.filename.endswith(('.xlsx', '.xls')):
         return jsonify({"erro": "Formato inválido. Use .xlsx ou .xls"}), 400
-
     try:
         wb = load_workbook(io.BytesIO(arquivo.read()), data_only=True)
         ws = wb.active
-
-        notas_existentes = load_data()
-        ids_existentes = {n['numero']: n for n in notas_existentes}
-
+        notas = load_data(session['user'])
+        idx = {n['numero']: n for n in notas}
         status_map = {
-            'em processamento': 'processando',
-            'processando': 'processando',
-            'em medição': 'medicao',
-            'medição': 'medicao',
-            'medicao': 'medicao',
-            'com pendência': 'pendencia',
-            'pendência': 'pendencia',
-            'pendencia': 'pendencia',
-            'concluída': 'concluida',
-            'concluida': 'concluida',
-            'lançado': 'concluida',
+            'em processamento': 'processando', 'processando': 'processando',
+            'em medição': 'medicao', 'medição': 'medicao', 'medicao': 'medicao',
+            'com pendência': 'pendencia', 'pendência': 'pendencia', 'pendencia': 'pendencia',
+            'concluída': 'concluida', 'concluida': 'concluida', 'lançado': 'concluida',
         }
-
-        importadas = 0
-        atualizadas = 0
-
+        importadas = atualizadas = 0
         for row in ws.iter_rows(min_row=2, values_only=True):
-            # Ignora linhas vazias
-            if not any(row):
-                continue
-
-            # Tenta extrair campos pela posição das colunas da planilha enviada
-            # Colunas: NF, Fornecedor, Valor, Status, Observação, Dias
+            if not any(row): continue
             try:
-                numero     = str(row[0]).strip().replace('#', '') if row[0] else None
+                numero     = str(row[0]).strip().replace('#','') if row[0] else None
                 fornecedor = str(row[1]).strip() if row[1] else ''
                 valor      = float(str(row[2]).replace('R$','').replace('.','').replace(',','.').strip()) if row[2] else 0
                 status_raw = str(row[3]).strip().lower() if row[3] else 'processando'
                 observacao = str(row[4]).strip() if row[4] else ''
                 dias       = int(row[5]) if row[5] else 0
-            except Exception:
-                continue
-
-            if not numero or numero == 'None':
-                continue
-
+            except Exception: continue
+            if not numero or numero == 'None': continue
             status = status_map.get(status_raw, 'processando')
-
-            if numero in ids_existentes:
-                # Atualiza nota existente
-                n = ids_existentes[numero]
-                n['fornecedor'] = fornecedor
-                n['valor']      = valor
-                n['status']     = status
-                n['observacao'] = observacao
-                n['dias']       = dias
+            if numero in idx:
+                n = idx[numero]
+                n.update(fornecedor=fornecedor, valor=valor, status=status, observacao=observacao, dias=dias)
                 atualizadas += 1
             else:
-                # Cria nova nota
-                nova = {
-                    "id": next_id(notas_existentes),
-                    "numero": numero,
-                    "fornecedor": fornecedor,
-                    "valor": valor,
-                    "status": status,
-                    "observacao": observacao,
-                    "dias": dias,
-                }
-                notas_existentes.append(nova)
-                ids_existentes[numero] = nova
+                nova = {"id": next_id(notas), "numero": numero, "fornecedor": fornecedor,
+                        "valor": valor, "status": status, "observacao": observacao, "dias": dias}
+                notas.append(nova)
+                idx[numero] = nova
                 importadas += 1
-
-        save_data(notas_existentes)
-        return jsonify({
-            "ok": True,
-            "importadas": importadas,
-            "atualizadas": atualizadas,
-            "total": len(notas_existentes)
-        })
-
+        save_data(session['user'], notas)
+        return jsonify({"ok": True, "importadas": importadas, "atualizadas": atualizadas, "total": len(notas)})
     except Exception as e:
         return jsonify({"erro": str(e)}), 500
-
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

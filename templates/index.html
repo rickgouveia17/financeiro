@@ -39,7 +39,11 @@
 
     <div class="topbar">
       <h2 id="page-title">Dashboard</h2>
-      <button class="btn-primary" onclick="abrirModal()">+ Nova NF</button>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:0.82rem;color:#888;">{{ nome }}</span>
+        <a href="/logout" style="font-size:0.8rem;color:#e74c3c;text-decoration:none;border:1px solid #e74c3c;padding:5px 12px;border-radius:6px;">Sair</a>
+        <button class="btn-primary" onclick="abrirModal()">+ Nova NF</button>
+      </div>
     </div>
 
     <!-- DASHBOARD -->

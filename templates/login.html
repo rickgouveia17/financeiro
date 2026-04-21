@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sistema Farol — Login</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #eef1f7;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-wrap {
+      display: flex;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+      overflow: hidden;
+      width: 820px;
+      min-height: 480px;
+    }
+
+    /* ── LADO ESQUERDO — ANIMAÇÃO ── */
+    .login-art {
+      flex: 1;
+      background: linear-gradient(135deg, #1b2232 0%, #2a3a5c 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-art h2 {
+      color: #f0a500;
+      font-size: 1.3rem;
+      margin-bottom: 6px;
+      z-index: 2;
+    }
+
+    .login-art p {
+      color: #9aa5bf;
+      font-size: 0.82rem;
+      text-align: center;
+      z-index: 2;
+    }
+
+    /* Desk scene */
+    .scene {
+      width: 260px;
+      height: 220px;
+      position: relative;
+      margin-bottom: 24px;
+    }
+
+    /* Mesa */
+    .desk {
+      position: absolute;
+      bottom: 0;
+      left: 10px;
+      right: 10px;
+      height: 14px;
+      background: #c8a96e;
+      border-radius: 4px;
+    }
+    .desk-leg {
+      position: absolute;
+      bottom: -30px;
+      width: 10px;
+      height: 30px;
+      background: #a07840;
+      border-radius: 2px;
+    }
+    .desk-leg.left  { left: 30px; }
+    .desk-leg.right { right: 30px; }
+
+    /* Pilha de papéis */
+    .papers {
+      position: absolute;
+      bottom: 14px;
+      left: 30px;
+      width: 70px;
+    }
+    .paper {
+      width: 70px;
+      height: 90px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 3px;
+      position: absolute;
+      bottom: 0;
+      box-shadow: 1px 1px 4px rgba(0,0,0,0.1);
+    }
+    .paper:nth-child(1) { transform: rotate(-4deg); left: 0; }
+    .paper:nth-child(2) { transform: rotate(2deg);  left: 4px; bottom: 2px; }
+    .paper:nth-child(3) { transform: rotate(0deg);  left: 2px; bottom: 4px; background: #f0f4ff; }
+
+    .paper-line {
+      width: 50px; height: 4px;
+      background: #dde3f0;
+      border-radius: 2px;
+      margin: 10px auto 4px;
+    }
+    .paper-line.short { width: 35px; }
+    .paper-line.orange { background: #f0a500; opacity: 0.5; }
+
+    /* Personagem */
+    .person {
+      position: absolute;
+      bottom: 14px;
+      right: 20px;
+      width: 80px;
+      animation: sway 3s ease-in-out infinite;
+      transform-origin: bottom center;
+    }
+
+    @keyframes sway {
+      0%,100% { transform: rotate(0deg); }
+      30%      { transform: rotate(-2deg); }
+      70%      { transform: rotate(1.5deg); }
+    }
+
+    /* Corpo */
+    .body-torso {
+      width: 36px; height: 50px;
+      background: #4f8ef7;
+      border-radius: 8px 8px 4px 4px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    /* Cabeça */
+    .head {
+      width: 30px; height: 30px;
+      background: #f5c5a3;
+      border-radius: 50%;
+      margin: 0 auto 2px;
+      position: relative;
+    }
+    .hair {
+      position: absolute;
+      top: -4px; left: 2px;
+      width: 26px; height: 14px;
+      background: #3d2b1f;
+      border-radius: 50% 50% 0 0;
+    }
+    .hair-side {
+      position: absolute;
+      top: 4px; right: -4px;
+      width: 8px; height: 16px;
+      background: #3d2b1f;
+      border-radius: 0 4px 8px 0;
+    }
+
+    /* Braços animados */
+    .arm {
+      position: absolute;
+      width: 10px; height: 36px;
+      background: #4f8ef7;
+      border-radius: 5px;
+      top: 6px;
+      transform-origin: top center;
+    }
+    .arm.left  {
+      left: -10px;
+      animation: armLeft 1.4s ease-in-out infinite;
+    }
+    .arm.right {
+      right: -10px;
+      animation: armRight 1.4s ease-in-out infinite;
+    }
+
+    @keyframes armLeft {
+      0%,100% { transform: rotate(-20deg); }
+      50%      { transform: rotate(20deg); }
+    }
+    @keyframes armRight {
+      0%,100% { transform: rotate(20deg); }
+      50%      { transform: rotate(-20deg); }
+    }
+
+    /* Papel na mão */
+    .hand-paper {
+      position: absolute;
+      bottom: -14px; left: -4px;
+      width: 18px; height: 22px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 2px;
+      animation: paperMove 1.4s ease-in-out infinite;
+    }
+    @keyframes paperMove {
+      0%,100% { opacity: 1; }
+      50%      { opacity: 0.6; }
+    }
+
+    /* Saia */
+    .skirt {
+      width: 44px; height: 24px;
+      background: #2a3a5c;
+      border-radius: 0 0 20px 20px;
+      margin: 0 auto;
+    }
+
+    /* Pernas */
+    .legs {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 2px;
+    }
+    .leg {
+      width: 10px; height: 22px;
+      background: #f5c5a3;
+      border-radius: 0 0 4px 4px;
+    }
+
+    /* Papéis voando */
+    .fly-paper {
+      position: absolute;
+      width: 22px; height: 28px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 2px;
+      opacity: 0;
+      animation: flyUp 2.8s ease-in-out infinite;
+    }
+    .fly-paper:nth-child(1) { left: 80px; bottom: 80px; animation-delay: 0s; }
+    .fly-paper:nth-child(2) { left: 110px; bottom: 60px; animation-delay: 0.9s; transform: rotate(15deg); }
+    .fly-paper:nth-child(3) { left: 60px; bottom: 70px; animation-delay: 1.8s; transform: rotate(-10deg); }
+
+    @keyframes flyUp {
+      0%   { opacity: 0; transform: translateY(0) rotate(0deg); }
+      20%  { opacity: 0.8; }
+      100% { opacity: 0; transform: translateY(-60px) rotate(20deg); }
+    }
+
+    /* ── LADO DIREITO — FORM ── */
+    .login-form {
+      width: 340px;
+      padding: 50px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .login-form .logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #1b2232;
+      margin-bottom: 6px;
+    }
+    .login-form .logo span { color: #f0a500; }
+
+    .login-form .sub {
+      font-size: 0.8rem;
+      color: #888;
+      margin-bottom: 32px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.78rem;
+      color: #555;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #dde1ea;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      background: #f7f8fa;
+      color: #333;
+      transition: border 0.2s;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: #4f8ef7;
+      background: #fff;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      background: #f0a500;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+    .btn-login:hover { background: #d4920a; }
+
+    .erro-msg {
+      color: #e74c3c;
+      font-size: 0.8rem;
+      margin-top: 10px;
+      text-align: center;
+      min-height: 18px;
+    }
+
+    @media (max-width: 700px) {
+      .login-art { display: none; }
+      .login-wrap { width: 100%; min-height: 100vh; border-radius: 0; }
+      .login-form { width: 100%; padding: 40px 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="login-wrap">
+
+  <!-- ANIMAÇÃO -->
+  <div class="login-art">
+    <div class="scene">
+      <!-- Papéis voando -->
+      <div class="fly-paper"></div>
+      <div class="fly-paper"></div>
+      <div class="fly-paper"></div>
+
+      <!-- Personagem -->
+      <div class="person">
+        <div class="head">
+          <div class="hair"></div>
+          <div class="hair-side"></div>
+        </div>
+        <div class="body-torso">
+          <div class="arm left"><div class="hand-paper"></div></div>
+          <div class="arm right"></div>
+        </div>
+        <div class="skirt"></div>
+        <div class="legs">
+          <div class="leg"></div>
+          <div class="leg"></div>
+        </div>
+      </div>
+
+      <!-- Mesa -->
+      <div class="papers">
+        <div class="paper">
+          <div class="paper-line"></div>
+          <div class="paper-line short"></div>
+          <div class="paper-line orange"></div>
+          <div class="paper-line short"></div>
+        </div>
+        <div class="paper"></div>
+        <div class="paper"></div>
+      </div>
+
+      <div class="desk">
+        <div class="desk-leg left"></div>
+        <div class="desk-leg right"></div>
+      </div>
+    </div>
+
+    <h2>🚦 Sistema Farol</h2>
+    <p>Controle de Notas Fiscais<br/>Organizado e seguro</p>
+  </div>
+
+  <!-- FORMULÁRIO -->
+  <div class="login-form">
+    <div class="logo">Sistema <span>Farol</span></div>
+    <div class="sub">Faça login para acessar seu painel</div>
+
+    <div class="form-group">
+      <label>Usuário</label>
+      <input type="text" id="usuario" placeholder="financeiro1" autocomplete="username"/>
+    </div>
+    <div class="form-group">
+      <label>Senha</label>
+      <input type="password" id="senha" placeholder="••••••••" autocomplete="current-password"
+             onkeydown="if(event.key==='Enter') entrar()"/>
+    </div>
+
+    <button class="btn-login" onclick="entrar()">Entrar</button>
+    <div class="erro-msg" id="erro"></div>
+  </div>
+
+</div>
+
+<script>
+async function entrar() {
+  const usuario = document.getElementById('usuario').value.trim();
+  const senha   = document.getElementById('senha').value.trim();
+  const erro    = document.getElementById('erro');
+  erro.textContent = '';
+
+  if (!usuario || !senha) { erro.textContent = 'Preencha usuário e senha.'; return; }
+
+  const res = await fetch('/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ usuario, senha })
+  });
+
+  if (res.ok) {
+    window.location.href = '/';
+  } else {
+    const data = await res.json();
+    erro.textContent = data.erro || 'Erro ao fazer login.';
+  }
+}
+</script>
+
+</body>
+</html>
